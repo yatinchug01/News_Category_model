@@ -1,27 +1,26 @@
-from flask import Flask, request, jsonify
+from flask import Flask,render_template, request, jsonify
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+from flask_cors import CORS
 from bs4 import BeautifulSoup
-import requests
+from model import model
 
 app = Flask(__name__)
-
+client=MongoClient('mongodb://localhost:27017')
+db=client['categories']
+CORS(app)
 history = []
 
-@app.route('/', methods=['POST'])
+@app.route('/classifier', methods=['POST'])
 def scrape():
-    data = request.get_json()
-    url = data['url']
+    data = request.json
+    url = data.get('url')
     
     try:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.content, 'html.parser')
+        soup = BeautifulSoup(url, 'html.parser')
         paragraphs = soup.find_all('p')
         article_content = ' '.join([p.text for p in paragraphs])
-        
-        # Perform AI model prediction using the article content
-        
-        # ...
-
-        predicted_category = "Some category"  # Replace with your actual prediction
+        predicted_category=model(article_content)
         
         # Store the request and prediction in history
         history.append({
@@ -29,14 +28,33 @@ def scrape():
             'predicted_category': predicted_category
         })
 
-        return jsonify({'predictedCategory': predicted_category})
+        db['users'].insert_one({
+            "url": url,
+            "predicted_category": predicted_category
+        })
+
+        return jsonify({
+
+            'predictedCategory': predicted_category
+            })
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/history', methods=['GET'])
+@app.route('/classifier', methods=['GET'])
 def get_history():
-    return jsonify(history)
+    all_data=db['user'].find()
+    dataJson=[]
+    for data in all_data:
+        url=data['url']
+        predicted_category=data['predictedCategory']
+
+        dataDict={
+            "url":url,
+            "predicted_category":predicted_category
+        }
+        dataJson.append(dataDict)
+    return jsonify(dataJson)
 
 if __name__ == '__main__':
     app.run(debug=True)

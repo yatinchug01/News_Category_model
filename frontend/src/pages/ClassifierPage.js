@@ -4,18 +4,14 @@ function ClassifierPage(){
 
 
 
-     const [url, setUrl] = useState('');
-  const [predictedCategory, setPredictedCategory] = useState('');
-
-//   useEffect(() => {
-//     // Fetch history data from the backend when the component mounts
-//     fetch('/api/history')
-//       .then((response) => response.json())
-//       .then((data) => setHistory(data));
-//   }, []);
+const [url, setUrl] = useState('');
+const [predictedCategory, setPredictedCategory] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const requestBody = {
+      url: url
+     };
 
     try {
       const response = await fetch('/classifier', {
@@ -23,18 +19,28 @@ function ClassifierPage(){
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ requestBody }),
+      });
+      
+      const data = await response.json();
+      setPredictedCategory(data.predictedCategory);
+      
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+
+        try {
+      const response = await fetch('/classifier', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ requestBody }),
       });
       
       const data = await response.json();
       
-      // Update the predicted category state with the response data
-      setPredictedCategory(data.predictedCategory);
-
-      // Fetch updated history data from the backend
-    //   fetch('/api/history')
-    //     .then((response) => response.json())
-    //     .then((data) => setHistory(data));
       
     } catch (error) {
       console.error('Error:', error);
@@ -51,7 +57,20 @@ function ClassifierPage(){
          <h6 class="mt-2">Predicted Category:</h6>
          <p>{predictedCategory}</p>
        </div>
-      
+      <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">URL</th>
+      <th scope="col">Category</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+    </tr>
+  </tbody>
+</table>
      </div>
 }
 

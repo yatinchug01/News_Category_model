@@ -7,7 +7,7 @@ function HomePage(){
         <Header/>
         <h1 class="text-center mt-2">Intructions</h1>
         <div class="text-center"><p>how to use this news article model
-            bla bla bla
+            
         </p>
         <Link to='/classifier' type="button" class="btn btn-secondary">Classifier</Link>
         </div>
