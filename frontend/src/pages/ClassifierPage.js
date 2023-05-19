@@ -39,7 +39,7 @@ const [predictedCategory, setPredictedCategory] = useState('');
         body: JSON.stringify({ requestBody }),
       });
       
-      const data = await response.json();
+      const data2 = await response.json();
       
       
     } catch (error) {
@@ -65,9 +65,10 @@ const [predictedCategory, setPredictedCategory] = useState('');
     </tr>
   </thead>
   <tbody>
+    for i in data.value:
     <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
+      <th scope="row">{data2.url}</th>
+      <td>{data2.predictedCategory}</td>
     </tr>
   </tbody>
 </table>
